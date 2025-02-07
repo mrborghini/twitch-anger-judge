@@ -13,7 +13,7 @@ export enum LlmRole {
   User = "user",
 }
 
-export interface LLMMessage {
+export interface LlmMessage {
   role: LlmRole;
   content: string;
 }
@@ -34,9 +34,39 @@ export interface CohereContent {
 }
 
 export interface OllamaResponse {
-  message: LLMMessage;
+  message: LlmMessage;
 }
 
 export interface OpenAIResponse {
-  choices: LLMMessage[];
+  choices: LlmMessage[];
+}
+
+export interface TwitchWSResponse {
+  username: string;
+  email: string;
+  channel: string;
+  content: string;
+}
+
+export interface LlmAnalysis {
+  mood_score: number;
+  message: string;
+  timeout_seconds: number;
+}
+
+export interface TwitchUser {
+  data: TwitchUserData[];
+}
+
+export interface TwitchUserData {
+  broadcaster_type: string;
+  created_at: string;
+  description: string;
+  display_name: string;
+  id: string;
+  login: string;
+  offline_image_url: string;
+  profile_image_url: string;
+  type: string;
+  view_count: number;
 }

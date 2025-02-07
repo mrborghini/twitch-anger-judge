@@ -1,4 +1,4 @@
-import { CohereResponse, LLMMessage } from "../types.ts";
+import { CohereResponse, LlmMessage } from "../types.ts";
 import { LLMClient } from "./llm-client.ts";
 
 export class CohereHandler extends LLMClient {
@@ -30,7 +30,7 @@ export class CohereHandler extends LLMClient {
     return JSON.stringify(cohereFormat);
   }
 
-  public override async generate(messages: LLMMessage[]): Promise<LLMMessage> {
+  public override async generate(messages: LlmMessage[]): Promise<LlmMessage> {
     const systemMessage = await this.getSystemPrompt();
     messages.unshift(systemMessage);
     const format = JSON.parse(await this.formatJsonFormat());

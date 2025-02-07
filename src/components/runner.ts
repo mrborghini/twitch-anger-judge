@@ -3,12 +3,15 @@ import { LLMClient } from "./llm-handlers/llm-client.ts";
 import { OllamaHandler } from "./llm-handlers/ollama-handler.ts";
 import { OpenAIHandler } from "./llm-handlers/openai-handler.ts";
 import { Logger } from "./logger.ts";
-import { LLMMessage, LlmRole } from "./types.ts";
+import { TwitchApiClient } from "./twitch-api-client.ts";
+import { TwitchWebsocketClient } from "./twitch-websocket-client.ts";
+import { LlmAnalysis, LlmMessage, LlmRole, TwitchWSResponse } from "./types.ts";
 
 // Twitch credentials
 const TWITCH_ACCESS_TOKEN = Deno.env.get("TWITCH_ACCESS_TOKEN") || "";
-const TWITCH_REFRESH_TOKEN = Deno.env.get("TWITCH_REFRESH_TOKEN") || "";
 const TWITCH_CLIENT_ID = Deno.env.get("TWITCH_CLIENT_ID") || "";
+const TWITCH_NAME = Deno.env.get("TWITCH_NAME") || "";
+const STREAMER_CHANNEL = Deno.env.get("STREAMER_CHANNEL") || "";
 
 // LLM Credentials
 const LLM_TEMPERATURE = parseFloat(Deno.env.get("LLM_TEMPERATURE") ?? "0.7");
@@ -32,8 +35,21 @@ const OLLAMA_URL = Deno.env.get("OLLAMA_URL") || "";
 const OLLAMA_NUM_CTX = parseInt(Deno.env.get("OLLAMA_NUM_CTX") || "");
 
 export class Runner {
+  private logger = new Logger("Runner");
   private llmClient: LLMClient;
-  private messages: LLMMessage[] = [];
+  private messages: LlmMessage[] = [];
+
+  private ttvApi = new TwitchApiClient(
+    TWITCH_ACCESS_TOKEN,
+    TWITCH_CLIENT_ID,
+    TWITCH_NAME,
+    STREAMER_CHANNEL,
+  );
+  private ttvWs = new TwitchWebsocketClient(
+    TWITCH_ACCESS_TOKEN,
+    TWITCH_NAME,
+    STREAMER_CHANNEL,
+  );
 
   public constructor() {
     this.llmClient = this.getLLMClient();
@@ -41,6 +57,7 @@ export class Runner {
 
   private getLLMClient(): LLMClient {
     if (COHERE_TOKEN) {
+      this.logger.info("Selected Cohere");
       return new CohereHandler(
         SYSTEM_PROMPT_PATH,
         FORMAT_PATH,
@@ -51,6 +68,7 @@ export class Runner {
     }
 
     if (OPENAI_TOKEN) {
+      this.logger.info("Selected OpenAI");
       return new OpenAIHandler(
         SYSTEM_PROMPT_PATH,
         FORMAT_PATH,
@@ -60,6 +78,7 @@ export class Runner {
       );
     }
 
+    this.logger.info("Selected Ollama");
     return new OllamaHandler(
       SYSTEM_PROMPT_PATH,
       FORMAT_PATH,
@@ -70,7 +89,7 @@ export class Runner {
     );
   }
 
-  private addMessage(message: LLMMessage) {
+  private addMessage(message: LlmMessage) {
     this.messages.push(message);
 
     if (this.messages.length >= MAX_MESSAGES_REMEMBERED) {
@@ -79,27 +98,49 @@ export class Runner {
     }
   }
 
+  private async onMessage(message: TwitchWSResponse) {
+    try {
+      this.logger.info(
+        `Received new message in ${message.channel} from ${message.username}: ${message.content}`,
+      );
+
+      if (
+        message.channel === message.username || message.username === TWITCH_NAME
+      ) {
+        return;
+      }
+
+      const currentMessages = this.messages;
+
+      const userMessage: LlmMessage = {
+        role: LlmRole.User,
+        content: `${message.username}: ${message.content}`,
+      };
+
+      currentMessages.push(userMessage);
+
+      const llmResponse = await this.llmClient.generate(currentMessages);
+      this.logger.debug(llmResponse.content);
+      const llmAnalysis = JSON.parse(llmResponse.content) as LlmAnalysis;
+      if (llmAnalysis.mood_score > TIMEOUT_MOOD_SCORE_THRESHOLD) {
+        return;
+      }
+
+      await this.ttvApi.timeoutUser(
+        message.username,
+        llmAnalysis.timeout_seconds,
+        llmAnalysis.message,
+      );
+
+      this.addMessage(userMessage);
+      this.addMessage(llmResponse);
+    } catch (error) {
+      this.logger.error(`Could not respond: ${error}`);
+    }
+  }
+
   public async run() {
-    const TWITCH_URL = "wss://irc-ws.chat.twitch.tv:443";
-    const logger = new Logger("Runner");
-    const ws = new WebSocket(TWITCH_URL);
-
-    logger.info("Connecting to Twitch...");
-
-    ws.onopen = (event) => {
-      logger.info("Sucessfully connected to Twitch!");
-    };
-
-    ws.onerror = () => {
-      logger.error(`Had an error`);
-    };
-
-    ws.onclose = (event) => {
-      logger.warning(`Connection closed: ${event.reason}`);
-    };
-
-    ws.onmessage = (event) => {
-      logger.debug(`Received new message: ${event.data}`);
-    };
+    await this.ttvApi.init();
+    this.ttvWs.init(this.onMessage.bind(this));
   }
 }

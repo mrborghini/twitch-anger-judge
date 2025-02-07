@@ -1,4 +1,4 @@
-import { LLMMessage, LlmRole } from "../types.ts";
+import { LlmMessage, LlmRole } from "../types.ts";
 
 export abstract class LLMClient {
   private systemPromptPath: string;
@@ -30,15 +30,15 @@ export abstract class LLMClient {
     return await Deno.readTextFile(this.formatPath);
   }
 
-  protected async getSystemPrompt(): Promise<LLMMessage> {
+  protected async getSystemPrompt(): Promise<LlmMessage> {
     const systemPromptContent = await Deno.readTextFile(this.systemPromptPath);
 
-    const llmMessage: LLMMessage = {
+    const llmMessage: LlmMessage = {
       role: LlmRole.System,
       content: systemPromptContent,
     };
     return llmMessage;
   }
 
-  public abstract generate(messages: LLMMessage[]): Promise<LLMMessage>;
+  public abstract generate(messages: LlmMessage[]): Promise<LlmMessage>;
 }

@@ -1,4 +1,4 @@
-import { LLMMessage, OllamaResponse } from "../types.ts";
+import { LlmMessage, OllamaResponse } from "../types.ts";
 import { LLMClient } from "./llm-client.ts";
 
 export class OllamaHandler extends LLMClient {
@@ -19,7 +19,7 @@ export class OllamaHandler extends LLMClient {
     this.numCtx = numCTX;
   }
 
-  public override async generate(messages: LLMMessage[]): Promise<LLMMessage> {
+  public override async generate(messages: LlmMessage[]): Promise<LlmMessage> {
     const url = `${this.url}/api/chat`;
 
     const systemMessage = await this.getSystemPrompt();

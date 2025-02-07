@@ -1,4 +1,4 @@
-import { LLMMessage, OpenAIResponse } from "../types.ts";
+import { LlmMessage, OpenAIResponse } from "../types.ts";
 import { LLMClient } from "./llm-client.ts";
 
 export abstract class GenericOpenAI extends LLMClient {
@@ -23,7 +23,7 @@ export abstract class GenericOpenAI extends LLMClient {
 
   protected abstract formatJsonFormat(): Promise<string>;
 
-  public override async generate(messages: LLMMessage[]): Promise<LLMMessage> {
+  public override async generate(messages: LlmMessage[]): Promise<LlmMessage> {
     const systemMessage = await this.getSystemPrompt();
     messages.unshift(systemMessage);
     const format = JSON.parse(await this.formatJsonFormat());
