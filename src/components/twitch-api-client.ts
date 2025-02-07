@@ -58,8 +58,6 @@ export class TwitchApiClient {
       this.streamerUser.data[0].id
     }&moderator_id=${this.botUser.data[0].id}`;
 
-    console.log(url);
-
     const body = {
       data: {
         user_id: victimUser.data[0].id,
