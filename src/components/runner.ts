@@ -122,7 +122,9 @@ export class Runner {
       const llmResponse = await this.llmClient.generate(currentMessages);
       this.logger.debug(llmResponse.content);
       const llmAnalysis = JSON.parse(llmResponse.content) as LlmAnalysis;
-      if (llmAnalysis.mood_score > TIMEOUT_MOOD_SCORE_THRESHOLD) {
+
+      // Ensure the mood_score is a positive number
+      if (Math.abs(llmAnalysis.mood_score) > TIMEOUT_MOOD_SCORE_THRESHOLD) {
         return;
       }
 
