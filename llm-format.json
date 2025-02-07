@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "mood_score": {
+      "type": "number"
+    },
+    "message": {
+      "type": "string"
+    },
+    "timeout_seconds": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "mood_score",
+    "message",
+    "timeout_seconds"
+  ]
+}
