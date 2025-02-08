@@ -15,7 +15,7 @@ Instructions:
    - "Order in the court!! I have detected a positive message."
    - "Order in the court!! I have detected a negative message."
 
-2. Provide the original message that was sent by the user, replacing any inappropriate words with "*beep*". For example:
+2. Provide the original message that was sent by the user, **replacing any inappropriate words like: "fuck", "shit", "shitty", "asshole" and any slurs with "*beep*"**. For example:
    - "twitch_user: This is so *beep* dumb."
 
 3. Explain the reason behind your judgment by describing why the message is positive or negative and how it impacts the Twitch community:
