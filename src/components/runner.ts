@@ -6,6 +6,7 @@ import { Logger } from "./logger.ts";
 import { TwitchApiClient } from "./twitch-api-client.ts";
 import { TwitchWebsocketClient } from "./twitch-websocket-client.ts";
 import { LlmAnalysis, LlmMessage, LlmRole, TwitchWSResponse } from "./types.ts";
+import { trimMessage } from "./utils.ts";
 
 // Twitch credentials
 const TWITCH_ACCESS_TOKEN = Deno.env.get("TWITCH_ACCESS_TOKEN") || "";
@@ -155,7 +156,7 @@ export class Runner {
       );
 
       this.ttvWs.sendMessage(
-        `PRIVMSG #${message.channel} :${llmAnalysis.message}`,
+        `PRIVMSG #${message.channel} :${trimMessage(llmAnalysis.message, 500)}`,
       );
     } catch (error) {
       this.logger.error(`Could not respond: ${error}`);

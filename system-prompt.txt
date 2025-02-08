@@ -28,6 +28,9 @@ Instructions:
    - Positive example: "Keep the vibes high!"
    - Negative example: "Respect the community or face the consequences!"
 
+6. Limit your responses to 500 characters.
+   - Twitch has a hard limit of 500 characters so please stay within that.
+
 Please maintain this following structure:
 
 ```json

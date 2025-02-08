@@ -1,4 +1,5 @@
 import { TwitchUser } from "./types.ts";
+import { trimMessage } from "./utils.ts";
 
 export class TwitchApiClient {
   private botUser: TwitchUser | null = null;
@@ -43,17 +44,6 @@ export class TwitchApiClient {
     return jsonResponse as TwitchUser;
   }
 
-  private trimMessage(message: string, maxLength: number) {
-    let newMessage = "";
-    for (let i = 0; i < message.length; i++) {
-      if (i >= maxLength) {
-        break;
-      }
-      newMessage += message[i];
-    }
-    return newMessage;
-  }
-
   public async timeoutUser(
     victim: string,
     timeSeconds: number,
@@ -68,7 +58,7 @@ export class TwitchApiClient {
     }
 
     if (reason) {
-      reason = this.trimMessage(reason, 500);
+      reason = trimMessage(reason, 500);
     }
 
     const victimUser = await this.getUser(victim);
