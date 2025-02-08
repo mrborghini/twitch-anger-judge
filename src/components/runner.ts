@@ -110,7 +110,7 @@ export class Runner {
         return;
       }
 
-      const currentMessages = this.messages;
+      const currentMessages = this.messages.slice();
 
       const userMessage: LlmMessage = {
         role: LlmRole.User,
@@ -122,9 +122,19 @@ export class Runner {
       const llmResponse = await this.llmClient.generate(currentMessages);
       this.logger.debug(llmResponse.content);
       const llmAnalysis = JSON.parse(llmResponse.content) as LlmAnalysis;
+      this.logger.info(
+        `'${userMessage.content}' has been analyzed: mood score: ${llmAnalysis.mood_score} timeout: ${llmAnalysis.timeout_seconds}s message: '${llmAnalysis.message}'`,
+      );
+
+      this.addMessage(userMessage);
+      this.addMessage(llmResponse);
+      this.logger.debug(
+        `last message: ${this.messages[this.messages.length - 1].content}`,
+      );
 
       // Ensure the mood_score is a positive number
       if (Math.abs(llmAnalysis.mood_score) > TIMEOUT_MOOD_SCORE_THRESHOLD) {
+        this.logger.debug(`Not mood score not low enough: ${llmAnalysis.mood_score} and it needs to be lower than: ${TIMEOUT_MOOD_SCORE_THRESHOLD}`)
         return;
       }
 
@@ -134,8 +144,9 @@ export class Runner {
         llmAnalysis.message,
       );
 
-      this.addMessage(userMessage);
-      this.addMessage(llmResponse);
+      this.ttvWs.sendMessage(
+        `PRIVMSG #${message.channel} :${llmAnalysis.message}`,
+      );
     } catch (error) {
       this.logger.error(`Could not respond: ${error}`);
     }
