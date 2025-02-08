@@ -128,18 +128,23 @@ export class Runner {
 
       this.addMessage(userMessage);
       this.addMessage(llmResponse);
+
       this.logger.debug(
         `last message: ${this.messages[this.messages.length - 1].content}`,
       );
 
       // Ensure the mood_score is a positive number
       if (Math.abs(llmAnalysis.mood_score) > TIMEOUT_MOOD_SCORE_THRESHOLD) {
-        this.logger.debug(`Not mood score not low enough: ${llmAnalysis.mood_score} and it needs to be lower than: ${TIMEOUT_MOOD_SCORE_THRESHOLD}`)
+        this.logger.debug(
+          `Not mood score not low enough: ${llmAnalysis.mood_score} and it needs to be lower than: ${TIMEOUT_MOOD_SCORE_THRESHOLD}`,
+        );
         return;
       }
 
       if (llmAnalysis.timeout_seconds <= 0) {
-        this.logger.debug(`No punishment given: ${llmAnalysis.timeout_seconds} seconds`)
+        this.logger.debug(
+          `No punishment given: ${llmAnalysis.timeout_seconds} seconds`,
+        );
         return;
       }
 
