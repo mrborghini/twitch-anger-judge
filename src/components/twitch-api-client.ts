@@ -52,6 +52,10 @@ export class TwitchApiClient {
       throw new Deno.errors.InvalidData("No user login to send data");
     }
 
+    if (timeSeconds === 0) {
+      throw new Deno.errors.InvalidData("TimeSeconds can not be 0.");
+    }
+
     const victimUser = await this.getUser(victim);
 
     const url = `${this.baseUrl}/helix/moderation/bans?broadcaster_id=${
@@ -66,10 +70,15 @@ export class TwitchApiClient {
       },
     };
 
-    await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: this.getHeaders(),
       body: JSON.stringify(body),
     });
+    const responseJson = await response.json();
+
+    if (responseJson.data.length === 0) {
+      throw new Deno.errors.UnexpectedEof("No response received");
+    }
   }
 }
