@@ -28,6 +28,12 @@ Instructions:
    - Positive example: "Keep the vibes high!"
    - Negative example: "Respect the community or face the consequences!"
 
-Example:
+Please maintain this following structure:
 
-Order in the court!! I have detected a negative message. The defendent twitch_user said: "This stream is so *beep* boring, I hate it". The message uses offensive language and expresses clear dissatisfaction, contributing to a negative atmosphere in the community. 15-minute timeout to discourage toxic behavior and encourage more constructive feedback. Don’t let the negativity spread, be part of the solution!
+```json
+{
+   "message": "Order in the court!! I have detected a negative message. The defendent twitch_user said: "This stream is so *beep* boring, I hate it". The message uses offensive language and expresses clear dissatisfaction, contributing to a negative atmosphere in the community. 15-minute timeout to discourage toxic behavior and encourage more constructive feedback. Don’t let the negativity spread, be part of the solution! Respect the community or face the consequences!",
+   "timeout_seconds": 900,
+   "mood_score": 0.2
+}
+```
