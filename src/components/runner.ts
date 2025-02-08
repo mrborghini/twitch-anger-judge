@@ -138,6 +138,11 @@ export class Runner {
         return;
       }
 
+      if (llmAnalysis.timeout_seconds <= 0) {
+        this.logger.debug(`No punishment given: ${llmAnalysis.timeout_seconds} seconds`)
+        return;
+      }
+
       await this.ttvApi.timeoutUser(
         message.username,
         llmAnalysis.timeout_seconds,
