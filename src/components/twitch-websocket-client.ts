@@ -32,7 +32,7 @@ export class TwitchWebsocketClient {
     const channel = splitSpaces[2].replace("#", "");
     const email = splitSpaces[0];
     const username = splitExclemation[0];
-    const message = splitColon[splitColon.length - 1];
+    const message = receivedMessage.split(" :")[1];
 
     const twitchResponse: TwitchWSResponse = {
       username: username,
