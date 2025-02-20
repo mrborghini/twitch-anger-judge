@@ -149,14 +149,14 @@ export class Runner {
         return;
       }
 
+      this.ttvWs.sendMessage(
+        `PRIVMSG #${message.channel} :${trimMessage(llmAnalysis.message, 500)}`,
+      );
+
       await this.ttvApi.timeoutUser(
         message.username,
         llmAnalysis.timeout_seconds,
         llmAnalysis.message,
-      );
-
-      this.ttvWs.sendMessage(
-        `PRIVMSG #${message.channel} :${trimMessage(llmAnalysis.message, 500)}`,
       );
     } catch (error) {
       this.logger.error(`Could not respond: ${error}`);
